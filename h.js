@@ -9,6 +9,7 @@
  */
 function h(tagName, attributes, children) {
     let el = document.createElement(tagName)
+    console.log(tagName, el)
     for (let key in attributes) {
         if (key === 'style') {
             const styles = attributes[key]
@@ -62,7 +63,8 @@ function handleChildren(root, children) {
             root.append(divEl)
             continue
         }
-        root.append(getChild(c))
+        let child = getChild(c)
+        child && root.append(child)
     }
 }
 
@@ -223,6 +225,7 @@ for (const tag of TAG_NAMES) {
 }
 
 export function isRef(value) {
+    if (value instanceof HTMLElement) return false
     return typeof value === 'object' && value && 'value' in value
 }
 
