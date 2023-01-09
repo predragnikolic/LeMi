@@ -19,32 +19,56 @@ function h(tagName, attributes, children) {
             continue
         }
         const value = attributes[key]
+        if (isRef(value)) {
+            // @ts-ignore
+            Act(() => el[key] = value.value)
+            continue
+        }
         // @ts-ignore
         el[key] = value
     }
 
-    /**
+    handleChildren(el, children)
+    return el
+}
+
+/**
+     * { function_description }
+     *
+     * @param      {HTMLElement}    root      The root
      * @param      {Children}  children  The children
      */
-    function handleChildren(children) {
-        for (const c of children) {
-            if (typeof c === 'boolean') continue
-            if (typeof c === 'object' && c === null) continue
-            if (typeof c === 'undefined') continue
-            if (typeof c === 'string') {
-                el.append(document.createTextNode(c))
-                continue
-            }
-            if (Array.isArray(c)) {
-                handleChildren(c)
-                continue
-            }
-            el.append(c)
+function handleChildren(root, children) {
+    for (const index in children) {
+        let c = children[index]
+        if (isRef(c)) {
+            let child = getChild(c.value)
+            handleChildren(root, [child])
+            Act(() => {
+                let newChild = getChild(c.value)
+                root.insertBefore(newChild, child);
+                child.remove()
+                child = newChild
+            })
+            continue
         }
+        root.append(getChild(c))
     }
+}
 
-    handleChildren(children)
-    return el
+function getChild(c) {
+    if (typeof c === 'boolean') return
+    if (typeof c === 'object' && c === null) return
+    if (typeof c === 'undefined') return
+    if (typeof c === 'string') return document.createTextNode(c)
+    if (typeof c === 'number') return document.createTextNode(String(c))
+    return c
+}
+
+function bindRef(value) {
+    const textNode = document.createTextNode(String(value.value))
+    Act(() => textNode.textContent = String(value.value))
+    return textNode
 }
 
 /** @type {TagName[]} */
@@ -179,6 +203,60 @@ for (const tag of TAG_NAMES) {
         throw new Error('Specify attributes and children. Or just specify children')
     }
 
-    // @ts-ignore
-    window[tag] = helper
+    Object.defineProperty(window, tag, {
+        enumerable: false,
+        get: () => helper,
+        set(newValue) {
+            throw new Error(`You cannot override property "${tag}".\n "${tag}" is used to create elements.`)
+        }
+    });
 }
+
+export function isRef(value) {
+    return typeof value === 'object' && value && 'value' in value
+}
+
+
+
+let listID = 0
+/**
+ * @template T
+ *
+ * @param      {Ref<Array<T>>}             list    The list
+ * @param      {(item: T, index: number) => HTMLElement}  mapFn   The map function
+ * @return     {HTMLElement}             { description_of_the_return_value }
+ */
+export function For(list, mapFn) {
+    let fragment = div()
+    let parent = Ref(null)
+    let nodes = []
+    let previousSibling, nextSibling;
+
+    setTimeout(() => {
+        previousSibling = fragment.previousSibling
+        nextSibling = fragment.nextSibling
+        parent.value = fragment.parentNode
+        if (!parent.value) throw new Error('List must be in a parent')
+        // fragment.remove()
+    })
+
+    Act(() => {
+        if (!parent.value) return
+        let newNodes = list.value.map((item, i) => mapFn(item, i))
+        if (previousSibling) {
+            [...newNodes].reverse().forEach(node => previousSibling.after(node))
+        } else if (nextSibling) {
+            newNodes.forEach(node => nextSibling.before(node))
+        } else {
+            // append to parrent
+            newNodes.forEach(node => parent.value.append(node))
+        }
+        nodes.forEach(node => node.remove())
+        nodes = newNodes
+    })
+
+    return fragment
+}
+
+window.For = For
+

@@ -1,17 +1,25 @@
-type Ref<T> = { value: T }
+type Ref<T> = { value: T, peek(): T, toString(): string, valueOf(): T }
 declare function Ref<T>(value: T): Ref<T>
-declare function Computed<T>(cb: () => infer T): Readonly<Ref<T>>
+declare function Memo<T>(cb: () => T): Readonly<Ref<T>>
+declare function Act(cb: () => void): void
 
+declare function For<T>(refArray: Ref<Array<T>>, mapToEl: (item: T, index: number) => HTMLElement): HTMLElement
+declare function When<T>(ref: Ref<T>, { [T]: HTMLElement }): HTMLElement
 
 type DeepPartial<T> = T extends object ? {
   [P in keyof T]?: DeepPartial<T[P]>;
 } : T
 
+type DeepRef<T> = T extends object ? {
+  [P in keyof T]: DeepRef<T[P]> | Ref<T[P]>;
+} : T
+
 type TagName = keyof HTMLElementTagNameMap
 
-type HtmlAttributes<T extends TagName> = DeepPartial<HTMLElementTagNameMap[T]>
+type HtmlAttributes<T extends TagName> = DeepRef<DeepPartial<HTMLElementTagNameMap[T]>>
 
-type Children = (HTMLElement | boolean | null | undefined | string | Children)[]
+type Child = HTMLElement | boolean | null | undefined | string | number | Ref<unknown> | (() => Child)
+type Children = Child[]
 
 DeepPartial < HTMLElementTagNameMap[T]
 

@@ -1,9 +1,9 @@
-let context = null
+const context = []
 
 function Act(cb) {
-	context = cb
-	context()
-	context = null
+	context.push(cb)
+	cb()
+	context.pop()
 }
 /**
  * @template T
@@ -11,10 +11,10 @@ function Act(cb) {
  * @param      {() => T}  cb      { parameter_description }
  * @return     {Readonly<Ref<T>>}    { description_of_the_return_value }
  */
-function Computed(cb) {
-	context = () => ref.value = cb()
+function Memo(cb) {
+	context.push(() => ref.value = cb())
 	const ref = Ref(cb())
-	context = null
+	context.pop()
 	return ref
 }
 
@@ -29,24 +29,42 @@ function Computed(cb) {
  */
 function Ref(value) {
 	let subs = []
+	let v = value
+	let ignore = false
 
-	return new Proxy({ value }, {
-		get(target) {
-			if (context) subs.push(context)
-
-			return target.value
+	return {
+		get value() {
+			if (!ignore) {
+				let ctx = context.at(-1)
+				if (ctx && !subs.includes(ctx)) subs.push(ctx)
+			}
+			return v
 		},
-		set(target, _property, newValue) {
-			if (target.value == newValue) return true
-
-			target.value = newValue
-			subs.forEach(cb => cb())
-			return true
+		peek() {
+			ignore = true
+			let ret = this.value
+			ignore = false
+			return ret
 		},
-	});
+		toString() {
+			return String(this.value)
+		},
+		valueOf() {
+			return this.value
+		},
+		set value(newValue) {
+			if (v == newValue) return
+			v = newValue
+			let oldSubs = [...subs]
+			subs = []
+			oldSubs.forEach(sub => Act(sub))
+		}
+	};
 }
+
+
 
 window.Ref = Ref
 window.Act = Act
-window.Computed = Computed
+window.Memo = Memo
 

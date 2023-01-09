@@ -1,49 +1,56 @@
 import './h.js'
 import './ref.js'
 
-let root = p({
-    className: 'hello you',
-    onclick() {
-        console.log('eee')
-    },
-}, [
-    Card({ name: 'pedja', age: 27 }),
-    Card({ name: 'ana', age: 27 })
-])
-
-let x = Ref(2)
-let y = Ref(2)
-
-
-let double = Computed(() => x.value * 2)
-
-let four = Computed(() => double.value * 4)
-
-
-Act(() => {
-    console.log('1x is :', x.value)
-    console.log('2x is :', double.value)
-    console.log('4x is :', four.value)
-})
-
-
-x.value = 1
 
 /**
  * @param      {{name: string, age: number}}  props   The properties
  */
-function Card(props) {
-    const people = [1, 1]
+function Card({ name, age }) {
+    let x = Ref(0)
+    let y = Ref(0)
+    let toggle = Ref(true)
+    let people = Ref([1, 2, 3, 4])
+
+    let person = {
+        ime: x
+    }
+
+    Act(() => console.log('people', people.value))
+
+    setInterval(() => x.value++, 1000)
 
     return div({ style: { background: '#eee', color: '#333' } }, [
-        p(['Ime:', props.name]),
-        p([
-            'Punolet|an/na:',
-            props.age > 18 ? 'da' : 'ne'
+        p({ onclick: () => { toggle.value = !toggle.value } },
+            ['Ime:', name, person.ime]),
+
+        () => toggle.value
+            ? div(['pedja'])
+            : div(['hello']),
+
+        ul({ onclick: () => { people.value = [...people.value, x.value] } }, [
+            'People:',
+            For(people, (person, i) => li([person, i])),
+            'end'
         ]),
-        hr()
+        'ee',
+        Foo({ z: x })
     ])
 }
 
+
+/**
+ * @param      {{z: Ref<number>}}  props   The properties
+ */
+function Foo({ z }) {
+    const className = Memo(() => `hello ${z}`)
+    return p({ className }, [z])
+}
+
+let root = p({
+    className: 'hello you'
+}, [
+    Card({ name: 'pedja', age: 27 }),
+    // Card({ name: 'ana', age: 27 })
+])
 
 document.body.appendChild(root)
