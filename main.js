@@ -1,6 +1,18 @@
 import './h.js'
 import './ref.js'
 
+/**
+ * @param      {{title: string, body: HTMLElement}}  props   The properties
+ */
+function Accordion({ title, body }) {
+    const open = Ref(true)
+
+    return div([
+        section({ onclick: () => open.value = !open.value }, [title]),
+        () => open.value && section([body])
+    ])
+}
+
 
 /**
  * @param      {{name: string, age: number}}  props   The properties
@@ -15,8 +27,6 @@ function Card({ name, age }) {
         ime: x
     }
 
-    Act(() => console.log('people', people.value))
-
     setInterval(() => x.value++, 1000)
 
     return div({ style: { background: '#eee', color: '#333' } }, [
@@ -25,14 +35,23 @@ function Card({ name, age }) {
 
         () => toggle.value
             ? div(['pedja'])
-            : div(['hello']),
+            : ul({ onclick: () => { people.value = [...people.value, x.value] } }, [
+                'People:',
+                For(people, (person, i) => li([person, i, x])),
+                'end'
+            ]),
 
-        ul({ onclick: () => { people.value = [...people.value, x.value] } }, [
-            'People:',
-            For(people, (person, i) => li([person, i])),
-            'end'
+        p({ onclick: () => toggle.value = !toggle.value }, [
+            'Toggle'
         ]),
+
+        ,
         'ee',
+        Accordion({
+            title: 'Naslov',
+            body: p(['neki tekst'])
+        }),
+
         Foo({ z: x })
     ])
 }
@@ -43,6 +62,9 @@ function Card({ name, age }) {
  */
 function Foo({ z }) {
     const className = Memo(() => `hello ${z}`)
+    Act(async () => {
+        let data = await helloMotherFucker()
+    })
     return p({ className }, [z])
 }
 

@@ -52,6 +52,16 @@ function handleChildren(root, children) {
             })
             continue
         }
+        if (typeof c === 'function') {
+            let divEl = div()
+            Act(() => {
+                let newEl = c()
+                divEl.replaceChildren()
+                if (newEl) divEl.append(newEl);
+            })
+            root.append(divEl)
+            continue
+        }
         root.append(getChild(c))
     }
 }
