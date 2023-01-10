@@ -9,7 +9,6 @@
  */
 function h(tagName, attributes, children) {
     let el = document.createElement(tagName)
-    console.log(tagName, el)
     for (let key in attributes) {
         if (key === 'style') {
             const styles = attributes[key]
