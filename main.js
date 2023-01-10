@@ -52,6 +52,8 @@ function Card({ name, age }) {
 
     setInterval(() => x.value++, 1000)
 
+    Act(() => console.log(people.value))
+
     return div({ style: { background: '#eee', color: '#333' } }, [
         // Children examples
         'You can use a string',
@@ -92,22 +94,20 @@ function Card({ name, age }) {
         () => toggle.value && 'The toggle is on',
 
         // list rendering
-        ul({ onclick: () => { people.value = [...people.value, x.value] } }, [
-            'People:',
-            For(people, (person, i) => li([person, i, x])),
-            'end'
+        ol({ onclick: () => { people.value = [...people.value, x.value] } }, [
+            For(people, (person, i) => li([person, i]))
         ]),
 
         // Using custom components,
-        Food(),
+        // Food(),
         // passing reactive props
         Foo({ z: x }),
 
         // more examples
-        For(people, (person) => Accordion({
+        For(people, (person, i) => Accordion({
             title: 'Naslov',
             // passing children as props however you want
-            body: p([person])
+            body: p([person, button({ onclick() { people.value = people.value.filter((p, ind) => ind !== i) } }, ['remove'])])
         })),
 
     ])

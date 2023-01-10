@@ -244,6 +244,7 @@ export function For(list, mapFn) {
     let parent = Ref(null)
     let nodes = []
     let previousSibling, nextSibling;
+    let oldList = []
 
     setTimeout(() => {
         previousSibling = fragment.previousSibling
@@ -255,7 +256,12 @@ export function For(list, mapFn) {
 
     Act(() => {
         if (!parent.value) return
-        let newNodes = list.value.map((item, i) => mapFn(item, i))
+        let newNodes = list.value.map((item, i) => {
+            let oldItem = oldList[i]
+            if (item === oldItem) return nodes[i]
+            let el = mapFn(item, i)
+            return el
+        })
         if (previousSibling) {
             [...newNodes].reverse().forEach(node => previousSibling.after(node))
         } else if (nextSibling) {
@@ -264,8 +270,11 @@ export function For(list, mapFn) {
             // append to parrent
             newNodes.forEach(node => parent.value.append(node))
         }
-        nodes.forEach(node => node.remove())
+        nodes.forEach(node => {
+            if (!newNodes.includes(node)) node.remove()
+        })
         nodes = newNodes
+        oldList = list.value
     })
 
     return fragment
