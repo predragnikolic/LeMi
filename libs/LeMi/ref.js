@@ -30,8 +30,6 @@ function Memo(cb) {
 /**
  * @template   T
  *
- * { function_description }
- *
  * @param      {T}  value   The value
  * @return     {Ref<T>}  { description_of_the_return_value }
  */

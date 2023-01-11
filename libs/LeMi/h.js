@@ -33,11 +33,9 @@ function h(tagName, attributes, children) {
 }
 
 /**
-     * { function_description }
-     *
-     * @param      {HTMLElement}    root      The root
-     * @param      {Children}  children  The children
-     */
+ * @param      {HTMLElement}    root      The root
+ * @param      {Children}  children  The children
+ */
 function handleChildren(root, children) {
     for (const index in children) {
         let c = children[index]
