@@ -1,4 +1,3 @@
-
 /**
  * @template   {keyof HTMLElementTagNameMap} TagName
  *
@@ -21,7 +20,7 @@ function h(tagName, attributes, children) {
         const value = attributes[key]
         if (isRef(value)) {
             // @ts-ignore
-            Act(() => el[key] = value.value)
+            React(() => el[key] = value.value)
             continue
         }
         // @ts-ignore
@@ -42,7 +41,7 @@ function handleChildren(root, children) {
         if (isRef(c)) {
             let child = getChild(c.value)
             handleChildren(root, [child])
-            Act(() => {
+            React(() => {
                 if (!isRef(c)) return
                 let newChild = getChild(c.value)
                 if (isNode(newChild) && isNode(child)) {
@@ -55,7 +54,7 @@ function handleChildren(root, children) {
         }
         if (typeof c === 'function') {
             let divEl = div()
-            Act(() => {
+            React(() => {
                 if (typeof c !== 'function') return
                 let child = getChild(c())
                 divEl.replaceChildren()
@@ -258,7 +257,7 @@ export function For(list, mapFn) {
     // a hack to detect a parent
     let spyNode = div()
     /** @type {Ref<ParentNode | null>} */
-    let parent = Ref(null)
+    let parent = Var(null)
     let nodes = new Map()
 
     setTimeout(function findParent() {
@@ -267,7 +266,7 @@ export function For(list, mapFn) {
         spyNode.remove()
     })
 
-    Act(() => {
+    React(() => {
         if (!parent.value) return
         let newNodes = list.value.map((item, i) => {
             let [key, newNode] = mapFn(item, i)

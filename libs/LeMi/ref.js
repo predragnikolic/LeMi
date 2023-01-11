@@ -8,7 +8,7 @@ const context = []
 /**
  * @param      {Context<void>}  cb      { parameter_description }
  */
-function Act(cb) {
+function React(cb) {
 	context.push(cb)
 	cb()
 	context.pop()
@@ -21,7 +21,7 @@ function Act(cb) {
  */
 function Memo(cb) {
 	context.push(() => ref.value = cb())
-	const ref = Ref(cb())
+	const ref = Var(cb())
 	context.pop()
 	return ref
 }
@@ -33,7 +33,7 @@ function Memo(cb) {
  * @param      {T}  value   The value
  * @return     {Ref<T>}  { description_of_the_return_value }
  */
-function Ref(value) {
+function Var(value) {
 	/** @type {Context<unknown>[]} */
 	let subs = []
 	let v = value
@@ -64,7 +64,7 @@ function Ref(value) {
 			v = newValue
 			let oldSubs = [...subs]
 			subs = []
-			oldSubs.forEach(sub => Act(sub))
+			oldSubs.forEach(sub => React(sub))
 		}
 	};
 }
@@ -78,8 +78,8 @@ function Peek(ref) {
 	return ref.peek()
 }
 
-window.Ref = Ref
-window.Peek = Peek
-window.Act = Act
+window.Var = Var
 window.Memo = Memo
+window.React = React
+window.Peek = Peek
 

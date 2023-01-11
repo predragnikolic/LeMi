@@ -10,11 +10,11 @@ document.body.appendChild(root)
  * @param      {{name: string, age: number}}  props   The properties
  */
 function Card({ name, age }) {
-    let x = Ref(0)
-    let y = Ref(0)
-    let toggle = Ref(false)
+    let x = Var(0)
+    let y = Var(0)
+    let toggle = Var(false)
     let id = 0
-    let people = Ref([
+    let people = Var([
         { id: id++, text: '1' },
         { id: id++, text: '2' },
         { id: id++, text: '3' }
@@ -25,11 +25,11 @@ function Card({ name, age }) {
         age,
         ime: x // reactive
     }
-    Act(() => console.log('this works', nestRefsInObjectForNestedReactivity.ime.value))
+    React(() => console.log('this works', nestRefsInObjectForNestedReactivity.ime.value))
 
     setInterval(() => x.value++, 1000)
 
-    Act(() => console.log(people.value))
+    React(() => console.log(people.value))
 
     return div({ style: { background: '#eee', color: '#333' } }, [
         // Children examples
@@ -93,8 +93,8 @@ function Card({ name, age }) {
  * Reuse refs where you need them.
  */
 function mouseCoords() {
-    let x = Ref(0)
-    let y = Ref(0)
+    let x = Var(0)
+    let y = Var(0)
 
     addEventListener('mousemove', (e) => {
         x.value = e.clientX
@@ -107,7 +107,7 @@ function mouseCoords() {
 function Food() {
     let { x, y } = mouseCoords()
 
-    Act(() => console.log(`x is ${x} y is ${y}`))
+    React(() => console.log(`x is ${x} y is ${y}`))
 
     return p()
 }
@@ -125,7 +125,7 @@ function Foo({ z }) {
  * @param      {{title: string, body: HTMLElement}}  props   The properties
  */
 function Accordion({ title, body }) {
-    const open = Ref(false)
+    const open = Var(false)
 
     return div([
         section({ onclick() { open.value = !open.value } }, [title]),
