@@ -1,15 +1,23 @@
+/**
+ * @template {unknown} Return
+ * @typedef {() => Return} Context
+ */
+/** @type {Context<unknown>[]} */
 const context = []
 
+/**
+ * @param      {Context<void>}  cb      { parameter_description }
+ */
 function Act(cb) {
 	context.push(cb)
 	cb()
 	context.pop()
 }
 /**
- * @template T
+ * @template Return
  *
- * @param      {() => T}  cb      { parameter_description }
- * @return     {Readonly<Ref<T>>}    { description_of_the_return_value }
+ * @param      {Context<Return>}  cb      { parameter_description }
+ * @return     {Readonly<Ref<Return>>}    { description_of_the_return_value }
  */
 function Memo(cb) {
 	context.push(() => ref.value = cb())
@@ -28,6 +36,7 @@ function Memo(cb) {
  * @return     {Ref<T>}  { description_of_the_return_value }
  */
 function Ref(value) {
+	/** @type {Context<unknown>[]} */
 	let subs = []
 	let v = value
 	let ignore = false

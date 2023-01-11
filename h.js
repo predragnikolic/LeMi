@@ -45,28 +45,38 @@ function handleChildren(root, children) {
             let child = getChild(c.value)
             handleChildren(root, [child])
             Act(() => {
+                if (!isRef(c)) return
                 let newChild = getChild(c.value)
-                root.insertBefore(newChild, child);
-                child.remove()
-                child = newChild
+                if (isNode(newChild) && isNode(child)) {
+                    root.insertBefore(newChild, child);
+                    child.remove()
+                    child = newChild
+                }
             })
             continue
         }
         if (typeof c === 'function') {
             let divEl = div()
             Act(() => {
-                let newEl = c()
+                if (typeof c !== 'function') return
+                let child = getChild(c())
                 divEl.replaceChildren()
-                if (newEl) divEl.append(newEl);
+                isNode(child) && divEl.append(child);
             })
             root.append(divEl)
             continue
         }
         let child = getChild(c)
-        child && root.append(child)
+        isNode(child) && root.append(child)
     }
 }
 
+/**
+ * Gets the child.
+ * @template T
+ * @param      {boolean | null | undefined | string | number | T}  c
+ * @return     {undefined | Text | T}  The child.
+ */
 function getChild(c) {
     if (typeof c === 'boolean') return
     if (typeof c === 'object' && c === null) return
@@ -76,11 +86,6 @@ function getChild(c) {
     return c
 }
 
-function bindRef(value) {
-    const textNode = document.createTextNode(String(value.value))
-    Act(() => textNode.textContent = String(value.value))
-    return textNode
-}
 
 /** @type {TagName[]} */
 const TAG_NAMES = [
@@ -223,30 +228,45 @@ for (const tag of TAG_NAMES) {
     });
 }
 
-export function isRef(value) {
+/**
+ * Determines whether the specified value is a Ref.
+ * @template T
+ * @param      {T}   value   The value
+ * @return     {value is Ref<T>}  True if the specified value is reference, False otherwise.
+ */
+function isRef(value) {
     if (value instanceof HTMLElement) return false
     return typeof value === 'object' && value && 'value' in value
 }
 
+/**
+ * Determines whether the specified value is a DOM node.
+ *
+ * @param      {unknown}   value   The value
+ * @return     {value is HTMLElement}  True if the specified value is node, False otherwise.
+ */
+function isNode(value) {
+    return value instanceof HTMLElement || value instanceof Text
+}
 
-
-let listID = 0
 /**
  * @template T
  *
  * @param      {Ref<Array<T>>}             list    The list
- * @param      {(item: T, index: number) => [Key: string | number, node: HTMLElement]}  mapFn   The map function
+ * @param      {(item: T, index: number) => [uniqueKey: string | number, node: HTMLElement]}  mapFn   The map function
  * @return     {HTMLElement}             { description_of_the_return_value }
  */
 export function For(list, mapFn) {
-    let fragment = div()
+    // a hack to detect a parent
+    let spyNode = div()
+    /** @type {Ref<ParentNode | null>} */
     let parent = Ref(null)
     let nodes = new Map()
 
-    setTimeout(() => {
-        parent.value = fragment.parentNode
+    setTimeout(function findParent() {
+        parent.value = spyNode.parentNode
         if (!parent.value) throw new Error('List must be in a parent')
-        // fragment.remove()
+        spyNode.remove()
     })
 
     Act(() => {
@@ -258,14 +278,20 @@ export function For(list, mapFn) {
             nodes.set(key, newNode)
             return newNode
         })
-        newNodes.forEach(node => parent.value.append(node))
+        newNodes.forEach(node => parent.value?.append(node))
         nodes.forEach(node => {
             if (!newNodes.includes(node)) node.remove()
         })
     })
 
-    return fragment
+    return spyNode
 }
 
-window.For = For
+Object.defineProperty(window, 'For', {
+    enumerable: false,
+    get: () => For,
+    set(newValue) {
+        throw new Error('You cannot override property "For".\n "For" is reserved for creating elements.')
+    }
+});
 

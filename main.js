@@ -1,41 +1,14 @@
 import './h.js'
 import './ref.js'
 
-/**
- * @param      {{title: string, body: HTMLElement}}  props   The properties
- */
-function Accordion({ title, body }) {
-    const open = Ref(false)
 
-    return div([
-        section({ onclick: () => open.value = !open.value }, [title]),
-        () => open.value && section([body])
-    ])
-}
+let root = p({
+    className: 'some_class_name'
+}, [
+    Card({ name: 'Pedja', age: 27 })
+])
 
-
-/**
- * Reuse refs where you need them.
- */
-function mouseCoords() {
-    let x = Ref(0)
-    let y = Ref(0)
-
-    addEventListener('mousemove', (e) => {
-        x.value = e.clientX
-        y.value = e.clientY
-    })
-
-    return { x, y }
-}
-
-function Food() {
-    let { x, y } = mouseCoords()
-
-    Act(() => console.log(`x is ${x} y is ${y}`))
-
-    return p()
-}
+document.body.appendChild(root)
 
 /**
  * @param      {{name: string, age: number}}  props   The properties
@@ -44,21 +17,19 @@ function Card({ name, age }) {
     let x = Ref(0)
     let y = Ref(0)
     let toggle = Ref(false)
-    let id = {
-        v: 3,
-        valueOf() {
-            this.v++
-            return this.v
-        }
-    }
+    let id = 0
     let people = Ref([
-        { id: id.valueOf(), text: '1' },
-        { id: id.valueOf(), text: '2' },
-        { id: id.valueOf(), text: '3' }
+        { id: id++, text: '1' },
+        { id: id++, text: '2' },
+        { id: id++, text: '3' }
     ])
-    let person = {
-        ime: x
+    // nested refs
+    let nestRefsInObjectForNestedReactivity = {
+        name,
+        age,
+        ime: x // reactive
     }
+    Act(() => console.log('this works', nestRefsInObjectForNestedReactivity.ime.value))
 
     setInterval(() => x.value++, 1000)
 
@@ -84,7 +55,7 @@ function Card({ name, age }) {
         }, [
             'Click me'
         ]),
-        button(['dsad']),
+        button(['Some button']),
 
         // Don't need .value for refs in render
         p(['X:', x]),
@@ -104,39 +75,64 @@ function Card({ name, age }) {
         () => toggle.value && 'The toggle is on',
 
         // list rendering
-        ol({ onclick: () => { people.value = [...people.value, { id: id.valueOf(), text: String(x.value) }] } }, [
-            For(people, (person, i) => [person.id, li([person.text, i])])
+        ol({ onclick: () => { people.value = [...people.value, { id: id++, text: String(x.value) }] } }, [
+            For(people, (person, i) => [person.id, li([person.text])])
         ]),
 
         // Using custom components,
-        // Food(),
+        Food(),
         // passing reactive props
         Foo({ z: x }),
 
         // more examples
         For(people, (person) => [person.id, Accordion({
-            title: 'Naslov',
+            title: 'Title',
             // passing children as props however you want
-            body: p([person.text, button({ onclick() { people.value = people.value.filter((p) => p.id !== person.id) } }, ['remove'])])
+            body: p([person.text, button({ onclick() { people.value = people.value.filter((p) => p.id !== person.id) } }, ['Remove'])])
         })]),
     ])
 }
 
+/**
+ * Reuse refs where you need them.
+ */
+function mouseCoords() {
+    let x = Ref(0)
+    let y = Ref(0)
+
+    addEventListener('mousemove', (e) => {
+        x.value = e.clientX
+        y.value = e.clientY
+    })
+
+    return { x, y }
+}
+
+function Food() {
+    let { x, y } = mouseCoords()
+
+    Act(() => console.log(`x is ${x} y is ${y}`))
+
+    return p()
+}
 
 /**
  * @param      {{z: Ref<number>}}  props   The properties
  */
 function Foo({ z }) {
-    const className = Memo(() => `hello ${z}`)
+    const className = Memo(() => `Hello ${z}`)
 
     return p({ className }, [z])
 }
 
-let root = p({
-    className: 'hello you'
-}, [
-    Card({ name: 'pedja', age: 27 }),
-    // Card({ name: 'ana', age: 27 })
-])
+/**
+ * @param      {{title: string, body: HTMLElement}}  props   The properties
+ */
+function Accordion({ title, body }) {
+    const open = Ref(false)
 
-document.body.appendChild(root)
+    return div([
+        section({ onclick() { open.value = !open.value } }, [title]),
+        () => open.value && section([body])
+    ])
+}

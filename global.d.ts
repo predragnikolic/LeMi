@@ -18,7 +18,7 @@ type TagName = keyof HTMLElementTagNameMap
 
 type HtmlAttributes<T extends TagName> = DeepRef<DeepPartial<HTMLElementTagNameMap[T]>>
 
-type Child = HTMLElement | boolean | null | undefined | string | number | Ref<unknown> | (() => Child)
+type Child = HTMLElement | Text | boolean | null | undefined | string | number | Ref<unknown> | (() => Child)
 type Children = Child[]
 
 DeepPartial < HTMLElementTagNameMap[T]
