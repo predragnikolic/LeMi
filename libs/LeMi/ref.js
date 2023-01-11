@@ -71,9 +71,17 @@ function Ref(value) {
 	};
 }
 
-
+/**
+ * @template T
+ * @param      {Ref<T>}  ref     The reference
+ * @return     {T}  { description_of_the_return_value }
+ */
+function Peek(ref) {
+	return ref.peek()
+}
 
 window.Ref = Ref
+window.Peek = Peek
 window.Act = Act
 window.Memo = Memo
 
