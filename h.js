@@ -235,19 +235,15 @@ let listID = 0
  * @template T
  *
  * @param      {Ref<Array<T>>}             list    The list
- * @param      {(item: T, index: number) => HTMLElement}  mapFn   The map function
+ * @param      {(item: T, index: number) => [Key: string | number, node: HTMLElement]}  mapFn   The map function
  * @return     {HTMLElement}             { description_of_the_return_value }
  */
 export function For(list, mapFn) {
     let fragment = div()
     let parent = Ref(null)
-    let nodes = []
-    let previousSibling, nextSibling;
-    let oldList = []
+    let nodes = new Map()
 
     setTimeout(() => {
-        previousSibling = fragment.previousSibling
-        nextSibling = fragment.nextSibling
         parent.value = fragment.parentNode
         if (!parent.value) throw new Error('List must be in a parent')
         // fragment.remove()
@@ -256,24 +252,16 @@ export function For(list, mapFn) {
     Act(() => {
         if (!parent.value) return
         let newNodes = list.value.map((item, i) => {
-            let oldItem = oldList[i]
-            if (item === oldItem) return nodes[i]
-            let el = mapFn(item, i)
-            return el
+            let [key, newNode] = mapFn(item, i)
+            let oldNode = nodes.get(key)
+            if (oldNode) return oldNode
+            nodes.set(key, newNode)
+            return newNode
         })
-        if (previousSibling) {
-            [...newNodes].reverse().forEach(node => previousSibling.after(node))
-        } else if (nextSibling) {
-            newNodes.forEach(node => nextSibling.before(node))
-        } else {
-            // append to parrent
-            newNodes.forEach(node => parent.value.append(node))
-        }
+        newNodes.forEach(node => parent.value.append(node))
         nodes.forEach(node => {
             if (!newNodes.includes(node)) node.remove()
         })
-        nodes = newNodes
-        oldList = list.value
     })
 
     return fragment

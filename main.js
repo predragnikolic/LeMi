@@ -44,8 +44,18 @@ function Card({ name, age }) {
     let x = Ref(0)
     let y = Ref(0)
     let toggle = Ref(false)
-    let people = Ref([1, 2, 3, 4])
-
+    let id = {
+        v: 3,
+        valueOf() {
+            this.v++
+            return this.v
+        }
+    }
+    let people = Ref([
+        { id: id.valueOf(), text: '1' },
+        { id: id.valueOf(), text: '2' },
+        { id: id.valueOf(), text: '3' }
+    ])
     let person = {
         ime: x
     }
@@ -94,8 +104,8 @@ function Card({ name, age }) {
         () => toggle.value && 'The toggle is on',
 
         // list rendering
-        ol({ onclick: () => { people.value = [...people.value, x.value] } }, [
-            For(people, (person, i) => li([person, i]))
+        ol({ onclick: () => { people.value = [...people.value, { id: id.valueOf(), text: String(x.value) }] } }, [
+            For(people, (person, i) => [person.id, li([person.text, i])])
         ]),
 
         // Using custom components,
@@ -104,12 +114,11 @@ function Card({ name, age }) {
         Foo({ z: x }),
 
         // more examples
-        For(people, (person, i) => Accordion({
+        For(people, (person) => [person.id, Accordion({
             title: 'Naslov',
             // passing children as props however you want
-            body: p([person, button({ onclick() { people.value = people.value.filter((p, ind) => ind !== i) } }, ['remove'])])
-        })),
-
+            body: p([person.text, button({ onclick() { people.value = people.value.filter((p) => p.id !== person.id) } }, ['remove'])])
+        })]),
     ])
 }
 

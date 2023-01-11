@@ -3,7 +3,7 @@ declare function Ref<T>(value: T): Ref<T>
 declare function Memo<T>(cb: () => T): Readonly<Ref<T>>
 declare function Act(cb: () => void): void
 
-declare function For<T>(refArray: Ref<Array<T>>, mapToEl: (item: T, index: number) => HTMLElement): HTMLElement
+declare function For<T>(refArray: Ref<Array<T>>, mapToEl: (item: T, index: number) => [uniqueKey: string | number, node: HTMLElement]): HTMLElement
 declare function When<T>(ref: Ref<T>, { [T]: HTMLElement }): HTMLElement
 
 type DeepPartial<T> = T extends object ? {
