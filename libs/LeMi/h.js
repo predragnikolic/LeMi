@@ -257,7 +257,7 @@ export function For(list, mapFn) {
     // a hack to detect a parent
     let spyNode = div()
     /** @type {Ref<ParentNode | null>} */
-    let parent = Var(null)
+    let parent = Ref(null)
     let nodes = new Map()
 
     setTimeout(function findParent() {

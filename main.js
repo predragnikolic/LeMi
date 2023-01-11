@@ -10,11 +10,11 @@ document.body.appendChild(root)
  * @param      {{name: string, age: number}}  props   The properties
  */
 function Card({ name, age }) {
-    let x = Var(0)
-    let y = Var(0)
-    let toggle = Var(false)
+    let x = Ref(0)
+    let y = Ref(0)
+    let toggle = Ref(false)
     let id = 0
-    let people = Var([
+    let people = Ref([
         { id: id++, text: '1' },
         { id: id++, text: '2' },
         { id: id++, text: '3' }
@@ -93,8 +93,8 @@ function Card({ name, age }) {
  * Reuse refs where you need them.
  */
 function mouseCoords() {
-    let x = Var(0)
-    let y = Var(0)
+    let x = Ref(0)
+    let y = Ref(0)
 
     addEventListener('mousemove', (e) => {
         x.value = e.clientX
@@ -125,7 +125,7 @@ function Foo({ z }) {
  * @param      {{title: string, body: HTMLElement}}  props   The properties
  */
 function Accordion({ title, body }) {
-    const open = Var(false)
+    const open = Ref(false)
 
     return div([
         section({ onclick() { open.value = !open.value } }, [title]),

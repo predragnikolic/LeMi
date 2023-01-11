@@ -21,7 +21,7 @@ function React(cb) {
  */
 function Memo(cb) {
 	context.push(() => ref.value = cb())
-	const ref = Var(cb())
+	const ref = Ref(cb())
 	context.pop()
 	return ref
 }
@@ -33,7 +33,7 @@ function Memo(cb) {
  * @param      {T}  value   The value
  * @return     {Ref<T>}  { description_of_the_return_value }
  */
-function Var(value) {
+function Ref(value) {
 	/** @type {Context<unknown>[]} */
 	let subs = []
 	let v = value
@@ -78,7 +78,7 @@ function Peek(ref) {
 	return ref.peek()
 }
 
-window.Var = Var
+window.Ref = Ref
 window.Memo = Memo
 window.React = React
 window.Peek = Peek
