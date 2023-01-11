@@ -29,11 +29,11 @@ function Card({ name, age }) {
         age,
         ime: x // reactive
     }
-    Act(() => console.log('this works', nestRefsInObjectForNestedReactivity.ime.value))
+    Act(() => console.log('this works', nestRefsInObjectForNestedReactivity.ime))
 
-    setInterval(() => x.value++, 1000)
+    setInterval(() => x++, 1000)
 
-    Act(() => console.log(people.value))
+    Act(() => console.log(people))
 
     return div({ style: { background: '#eee', color: '#333' } }, [
         // Children examples
@@ -60,23 +60,25 @@ function Card({ name, age }) {
         // Don't need .value for refs in render
         p(['X:', x]),
         // Y will not update! because .value is used
-        p(['Y:', y.value]),
+        p(['Y:', y]),
 
-        p({ onclick: () => toggle.value = !toggle.value }, [
+        p({ onclick() { toggle = !toggle } }, [
             'Toggle'
         ]),
         // ifs in render
         // sadly cannot find a way to write toggle ? doThis : doThat...
         // instead must use () => ref.value ? doThis : doThat
-        () => toggle.value
-            ? 'do this'
-            : 'do that',
+        toggle ? 'do this' : 'do that',
         // ifs in render 2 example
-        () => toggle.value && 'The toggle is on',
+        toggle && 'The toggle is on',
 
         // list rendering
-        ol({ onclick: () => { people.value = [...people.value, { id: id++, text: String(x.value) }] } }, [
-            For(people, (person, i) => [person.id, li([person.text])])
+        ol({ onclick: () => { people = [...people, { id: id++, text: String(x) }] } }, [
+            people.map((person, i) => [person.id,
+            li([
+                person.text
+            ])
+            ])
         ]),
 
         // Using custom components,
@@ -85,11 +87,13 @@ function Card({ name, age }) {
         Foo({ z: x }),
 
         // more examples
-        For(people, (person) => [person.id, Accordion({
+        people.map((person) => [person.id,
+        Accordion({
             title: 'Title',
             // passing children as props however you want
             body: p([person.text, button({ onclick() { people.value = people.value.filter((p) => p.id !== person.id) } }, ['Remove'])])
-        })]),
+        })
+        ]),
     ])
 }
 
