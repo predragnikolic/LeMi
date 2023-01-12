@@ -29,13 +29,18 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
     return sourceFile => {
       const visitor = (node: ts.Node): ts.Node => {
         let symbol = typeChecker.getSymbolAtLocation(node)
+
+
+
         // transform
         // var x = 0
         // to
         // var x = Ref(0)
         if (ts.isVariableDeclaration(node) && isVarDeclaration(node.parent.flags)) {
           const relatedSymbol = (node as any).symbol as ts.Symbol;
-          foundSymbols.push(relatedSymbol)
+          console.log('spread object', node.getFullText(),)
+
+          relatedSymbol && foundSymbols.push(relatedSymbol)
           const refFn = factory.createCallExpression(
             factory.createIdentifier("Ref"),
             undefined,
