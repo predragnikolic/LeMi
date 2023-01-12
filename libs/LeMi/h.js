@@ -38,7 +38,6 @@ function h(tagName, attributes, children) {
 function handleChildren(root, children) {
     for (const index in children) {
         let c = children[index]
-        console.log(children)
         if (isRef(c)) {
             let child = getChild(c.value)
             handleChildren(root, [child])
@@ -64,7 +63,6 @@ function handleChildren(root, children) {
             root.append(divEl)
             continue
         }
-        console.log(c)
         let child = getChild(c)
         isNode(child) && root.append(child)
     }

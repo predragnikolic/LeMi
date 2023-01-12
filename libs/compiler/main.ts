@@ -5,7 +5,7 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
   const typeChecker = program.getTypeChecker();
 
   // Create array of found symbols
-  const foundSymbols:ts.Symbol[] = [];
+  const foundSymbols: ts.Symbol[] = [];
   const isReactive = (symbol: ts.Symbol) => foundSymbols.includes(symbol)
 
   function NodeDotValue(name: string) {
@@ -15,6 +15,16 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
     )
   }
 
+  function createArrowFn(node: ts.Expression): ts.Node {
+    return factory.createArrowFunction(
+      undefined,
+      undefined,
+      [],
+      undefined,
+      factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+      node
+    )
+  }
   const transformerFactory: ts.TransformerFactory<ts.SourceFile> = context => {
     return sourceFile => {
       const visitor = (node: ts.Node): ts.Node => {
@@ -40,6 +50,25 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
           return newVar
         }
 
+        // [open.value ? 'open' : 'closed'],
+        // [() => open.value ? 'open' : 'closed]',
+        // this is required because how I implemented the front LeMi lib
+        if (ts.isConditionalExpression(node) && ts.isArrayLiteralExpression(node.parent)) {
+          let newNode: ts.ConditionalExpression | null = null
+          if (ts.isIdentifier(node.condition)) newNode = factory.createConditionalExpression(NodeDotValue(node.condition.getText()), node.questionToken, node.whenTrue, node.colonToken, node.whenFalse)
+          return createArrowFn(newNode ?? node)
+        }
+
+        // [open.value && 'true']
+        // [() => open.value && 'true']
+        // this is required because how I implemented the front LeMi lib
+        if (ts.isBinaryExpression(node) && ts.isArrayLiteralExpression(node.parent)) {
+          let newNode: ts.BinaryExpression | null = null
+          if (ts.isIdentifier(node.left)) newNode = factory.createBinaryExpression(NodeDotValue(node.left.getText()), node.operatorToken, node.right)
+
+          return createArrowFn(newNode ?? node)
+        }
+
         if (ts.isIdentifier(node) && symbol && isReactive(symbol)) {
           // !count
           // !count.value
@@ -52,15 +81,9 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             return NodeDotValue(symbol.name)
           }
 
-        // onClick={() => x = x + 1}
-        // onClick={() => x.value = x.value + 1}
+          // onClick={() => x = x + 1}
+          // onClick={() => x.value = x.value + 1}
           if (ts.isBinaryExpression(node.parent)) {
-            return NodeDotValue(symbol.name)
-          }
-
-          // open ? 'open' : 'closed',
-          // open.value ? 'open' : 'closed',
-          if (ts.isConditionalExpression(node.parent)) {
             return NodeDotValue(symbol.name)
           }
         }
