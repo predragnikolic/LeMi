@@ -1,5 +1,10 @@
+type Ref<T> = { value: T, peek(): T, toString(): string, valueOf(): T }
+
+declare function Ref<T>(value: T): Ref<T>
+declare function React(cb: Context<void>): void
+declare function Memo<Ret>(cb: Context<Ret>): Ref<Ret>
 declare function For<T>(refArray: Ref<Array<T>>, mapToEl: (item: T, index: number) => [uniqueKey: string | number, node: HTMLElement]): HTMLElement
-declare function When<T>(ref: Ref<T>, { [T]: HTMLElement }): HTMLElement
+declare function Peek<T>(ref: Ref<T>): T
 
 type DeepPartial<T> = T extends object ? {
   [P in keyof T]?: DeepPartial<T[P]>;

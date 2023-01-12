@@ -1,0 +1,26 @@
+{
+  "name": "frame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "ttsc -w",
+    "build": "ttsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/predragnikolic/LeMi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/predragnikolic/LeMi/issues"
+  },
+  "homepage": "https://github.com/predragnikolic/LeMi#readme",
+  "dependencies": {
+    "ttypescript": "^1.5.15",
+    "typescript": "^4.9.4"
+  }
+}
