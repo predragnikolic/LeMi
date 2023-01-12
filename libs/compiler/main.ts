@@ -42,7 +42,7 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
 
         if (ts.isIdentifier(node) && symbol && isReactive(symbol)) {
           // !count
-          // !count
+          // !count.value
           if (ts.isPrefixUnaryExpression(node.parent)) {
             return NodeDotValue(symbol.name)
           }
