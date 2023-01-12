@@ -1,4 +1,4 @@
-type Ref<T> = { value: T, peek(): T, toString(): string, valueOf(): T }
+type Ref<T> = T
 
 declare function Ref<T>(value: T): Ref<T>
 declare function React(cb: Context<void>): void

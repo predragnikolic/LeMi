@@ -1,23 +1,25 @@
-function Component() {
-  var count = 1
+function Count() {
+  var count = 0
   const doubleCount = Memo(() => count * 2)
-  var open = false
+  var people = [1, 2]
 
   React(() => console.log(`count: ${count}`))
+
+  React(() => console.log(`${people}`))
 
   return div([
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),
     p(['Double count is ', doubleCount]),
-    button({
-      onclick() { open = !open }
-    }, ['toggle', open ? 'Close it' : 'Open it']),
-    open && 'it is open'
+    ol([
+      For(people, (per, i) => [i, li([per])])
+    ]),
+    count == 2 && 'da'
   ])
 }
 
 export let root = div([
-  Component()
+  Count()
 ])
 
 document.body.appendChild(root)

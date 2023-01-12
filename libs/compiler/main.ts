@@ -81,6 +81,12 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             return NodeDotValue(symbol.name)
           }
 
+          // { people.value = [...people, 1] } }
+          // { people.value = [...people.value, 1] } }
+          if (ts.isSpreadElement(node.parent)) {
+            return NodeDotValue(symbol.name)
+          }
+
           // onClick={() => x = x + 1}
           // onClick={() => x.value = x.value + 1}
           if (ts.isBinaryExpression(node.parent)) {
