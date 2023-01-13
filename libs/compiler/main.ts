@@ -57,14 +57,16 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             // prevent: let params = {Read(x): Read(x)}
             // instead:  let params = {x: Read(x)}
             if (ts.isPropertyAssignment(node.parent) && node.parent.name === node) {
-              console.log('heere', node.getFullText())
               return node
             }
-            return factory.createCallExpression(
+
+            if (ts.isPropertyAssignment(node.parent) && node.parent.initializer === node) {
+              return factory.createCallExpression(
               factory.createIdentifier("Read"),
               undefined,
               [factory.createIdentifier(node.getText())]
             )
+            }
           }
         }
 

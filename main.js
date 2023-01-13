@@ -11,7 +11,6 @@ function mouseCoords() {
       y = 0
     }
 
-
     return { x, y, reset }
 }
 
@@ -23,18 +22,21 @@ function Count() {
   var people = [1, 2]
   let x3123 = 321
 
-  const {x, y, reset} = mouseCoords()
+  let {x, y, reset} = mouseCoords()
   const doubleX = Memo(() => x * 2)
 
   let ahsad = () => {
-    let xdsa = {
-      x
+    x = x + 1
+    let ds = {
+      x: x,
+      y
     }
   }
   React(() => {
     let param = {
       count,
-      y: y
+      x: x,
+      y
     }
 
     console.log(param)
