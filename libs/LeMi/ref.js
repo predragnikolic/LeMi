@@ -38,7 +38,7 @@ function Memo(cb) {
 function Ref(value) {
 	/** @type {Context<unknown>[]} */
 	let subs = []
-	let v = value
+	let v = isRef(value) ? value.value : value
 	let ignore = false
 
 	return {

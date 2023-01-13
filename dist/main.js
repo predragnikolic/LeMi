@@ -16,16 +16,12 @@ function mouseCoords() {
 //  const {x, y, reset} = mouseCoords()
 //  x = 2 // this is a no go
 //  Instead: only mutate x in `mouseCoords`
-// 2. If you want to pass a ref as a ref, then
-// {x} compiles to: {x}
-// If you want to read the value of a ref as a value, then
-// {x: x} compiles to: {x: x.value}
 function Count() {
     var count = Ref(0);
     const doubleCount = Memo(() => count.value * 2);
     var people = Ref([1, 2]);
     let x3123 = 321;
-    const { x, y, reset } = mouseCoords();
+    let { x, y, reset } = mouseCoords();
     const doubleX = Memo(() => x.value * 2);
     let ahsad = () => {
         let ds = {
@@ -48,19 +44,28 @@ function Count() {
         };
         console.log(Read(x), Read(y));
     });
+    var open = Ref(false);
     return div([
         button({ onclick() { count.value++; } }, ['Increase']),
         p(['Count is ', count]),
         p(['Double count is ', doubleCount]),
+        Toggle({ open }),
         ol([
             For(people, (per, i) => [i, li([per])])
         ]),
         () => count == 2 && 'da',
-        button({ onclick: reset }, ['Reset']),
+        button({ onclick: () => { open.value = !open.value; } }, ['Reset']),
         'x:', x,
         'y:', y,
         'x2:', doubleX
     ]);
+}
+/**
+ * @param      {{open: boolean}}  arg1       The argument 1
+ */
+function Toggle({ open }) {
+    var isOpen = Ref(open);
+    return p({ onclick() { isOpen.value = !isOpen.value; } }, [() => isOpen.value ? 'da' : 'ne', () => open.value ? 'parent da' : 'parent ne']);
 }
 export let root = div([
     Count()

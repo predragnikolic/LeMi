@@ -138,6 +138,11 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
                 return node
             }
 
+            const parameterNode = findParent(node, ts.isParameter)
+            if (parameterNode) {
+              return node
+            }
+
             //fixes return p(['Count is ', Read(count)]),
             // return { x: Read(x), y: Read(y), reset };
             const hasReturnNode = findParent(node, ts.isReturnStatement);

@@ -20,10 +20,6 @@ function mouseCoords() {
 //  x = 2 // this is a no go
 //  Instead: only mutate x in `mouseCoords`
 
-// 2. If you want to pass a ref as a ref, then
-// {x} compiles to: {x}
-// If you want to read the value of a ref as a value, then
-// {x: x} compiles to: {x: x.value}
 
 function Count() {
   var count = 0
@@ -31,7 +27,7 @@ function Count() {
   var people = [1, 2]
   let x3123 = 321
 
-  const {x, y, reset} = mouseCoords()
+  let {x, y, reset} = mouseCoords()
   const doubleX = Memo(() => x * 2)
 
   let ahsad = () => {
@@ -57,19 +53,29 @@ function Count() {
     }
     console.log(x, y)
   })
+  var open = false
   return div([
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),
     p(['Double count is ', doubleCount]),
+    Toggle({open}),
     ol([
       For(people, (per, i) => [i, li([per])])
     ]),
     count == 2 && 'da',
-    button({onclick: reset}, ['Reset']),
+    button({onclick: () => {open = !open}}, ['Reset']),
     'x:', x,
     'y:', y,
     'x2:', doubleX
   ])
+}
+
+/**
+ * @param      {{open: boolean}}  arg1       The argument 1
+ */
+function Toggle({open}) {
+  var isOpen = open
+  return p({onclick() {isOpen = !isOpen}}, [isOpen ? 'da' : 'ne', open ? 'parent da' : 'parent ne'])
 }
 
 export let root = div([
