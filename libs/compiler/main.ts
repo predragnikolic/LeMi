@@ -25,11 +25,28 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
       node
     )
   }
+
+  const findReactiveCall = (node: ts.Node) => {
+    if (!node.parent) return undefined
+    if (ts.isCallExpression(node.parent) && node.parent.expression.getText() === 'React') {
+      return node.parent
+    };
+    return findReactiveCall(node.parent);
+  };
+
   const transformerFactory: ts.TransformerFactory<ts.SourceFile> = context => {
     return sourceFile => {
       const visitor = (node: ts.Node): ts.Node => {
         let symbol = typeChecker.getSymbolAtLocation(node)
 
+        if (ts.isIdentifier(node) && !ts.isPropertyAccessExpression(node.parent) && node.getText() !== 'React') {
+            let rc = findReactiveCall(node)
+            if (rc) return factory.createCallExpression(
+              factory.createIdentifier("Read"),
+              undefined,
+              [factory.createIdentifier(node.getText())]
+          )
+        }
 
 
         // transform

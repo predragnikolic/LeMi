@@ -1,3 +1,5 @@
+import {isRef} from './h.js'
+
 /**
  * @template {unknown} Return
  * @typedef {() => Return} Context
@@ -40,6 +42,7 @@ function Ref(value) {
 	let ignore = false
 
 	return {
+		__isRef: true,
 		get value() {
 			if (!ignore) {
 				let ctx = context.at(-1)
@@ -78,8 +81,13 @@ function Peek(ref) {
 	return ref.peek()
 }
 
+function Read(maybeRef) {
+	return isRef(maybeRef) ? maybeRef.value : maybeRef
+}
+
 window.Ref = Ref
 window.Memo = Memo
 window.React = React
 window.Peek = Peek
+window.Read = Read
 

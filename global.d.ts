@@ -5,6 +5,7 @@ declare function React(cb: Context<void>): void
 declare function Memo<Ret>(cb: Context<Ret>): Ref<Ret>
 declare function For<T>(refArray: Ref<Array<T>>, mapToEl: (item: T, index: number) => [uniqueKey: string | number, node: HTMLElement]): HTMLElement
 declare function Peek<T>(ref: Ref<T>): T
+declare function Read<T>(ref: Ref<T> | T): T
 
 type DeepPartial<T> = T extends object ? {
   [P in keyof T]?: DeepPartial<T[P]>;

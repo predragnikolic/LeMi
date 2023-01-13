@@ -20,12 +20,13 @@ function Count() {
   var count = 0
   const doubleCount = Memo(() => count * 2)
   var people = [1, 2]
+  let x3123 = 321
 
   const {x, y, reset} = mouseCoords()
   const doubleX = Memo(() => x * 2)
 
-  React(() => console.log(`count: ${count}`))
-  React(() => console.log(`${x}, ${y}`))
+  React(() => console.log(count, x3123))
+  React(() => console.log(x, y))
 
   return div([
     button({ onclick() { count++ } }, ['Increase']),

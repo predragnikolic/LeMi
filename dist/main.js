@@ -15,10 +15,11 @@ function Count() {
     var count = Ref(0);
     const doubleCount = Memo(() => count.value * 2);
     var people = Ref([1, 2]);
+    let x3123 = 321;
     const { x, y, reset } = mouseCoords();
     const doubleX = Memo(() => x * 2);
-    React(() => console.log(`count: ${count}`));
-    React(() => console.log(`${x}, ${y}`));
+    React(() => console.log(Read(count), Read(x3123)));
+    React(() => console.log(Read(x), Read(y)));
     return div([
         button({ onclick() { count.value++; } }, ['Increase']),
         p(['Count is ', count]),

@@ -231,9 +231,9 @@ for (const tag of TAG_NAMES) {
  * @param      {T}   value   The value
  * @return     {value is Ref<T>}  True if the specified value is reference, False otherwise.
  */
-function isRef(value) {
+export function isRef(value) {
     if (value instanceof HTMLElement) return false
-    return typeof value === 'object' && value && 'value' in value
+    return typeof value === 'object' && value && '__isRef' in value
 }
 
 /**
