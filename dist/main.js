@@ -9,7 +9,7 @@ function mouseCoords() {
         x.value = 0;
         y.value = 0;
     };
-    return { x: Read(x), y: Read(y), reset };
+    return { x, y, reset };
 }
 function Count() {
     var count = Ref(0);
@@ -22,7 +22,7 @@ function Count() {
         x.value = x.value + 1;
         let ds = {
             x: Read(x),
-            y: Read(y)
+            y
         };
     };
     React(() => {

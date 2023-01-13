@@ -47,11 +47,7 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             // let params = {x}
             // prevent {Read(x)}
             if (ts.isShorthandPropertyAssignment(node.parent)) {
-              return factory.createPropertyAssignment(node.getText(), factory.createCallExpression(
-                factory.createIdentifier("Read"),
-                undefined,
-                [factory.createIdentifier(node.getText())]
-              ))
+              return node
             }
             // let params = {x: x}
             // prevent: let params = {Read(x): Read(x)}

@@ -34,9 +34,9 @@ function Count() {
   }
   React(() => {
     let param = {
-      count,
+      count: count,
       x: x,
-      y
+      y: y
     }
 
     console.log(param)
