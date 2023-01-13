@@ -30,13 +30,6 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
     )
   }
 
-  const findReactiveCall = (node: ts.Node) => {
-    if (!node.parent) return undefined
-    if (ts.isCallExpression(node.parent) && node.parent.expression.getText() === 'React') {
-      return node.parent
-    };
-    return findReactiveCall(node.parent);
-  };
 
   const transformerFactory: ts.TransformerFactory<ts.SourceFile> = context => {
     return sourceFile => {
@@ -49,9 +42,8 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
           }
         }
 
-        if (ts.isIdentifier(node) && !ts.isPropertyAccessExpression(node.parent) && node.getText() !== 'React') {
-          let rc = findReactiveCall(node)
-          if (rc && symbol && isReactive(symbol)) {
+        if (ts.isIdentifier(node)) {
+          if (symbol && isReactive(symbol)) {
             // let params = {x}
             // prevent {Read(x)}
             if (ts.isShorthandPropertyAssignment(node.parent)) {
@@ -65,6 +57,7 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             // prevent: let params = {Read(x): Read(x)}
             // instead:  let params = {x: Read(x)}
             if (ts.isPropertyAssignment(node.parent) && node.parent.name === node) {
+              console.log('heere', node.getFullText())
               return node
             }
             return factory.createCallExpression(

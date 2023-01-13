@@ -26,9 +26,15 @@ function Count() {
   const {x, y, reset} = mouseCoords()
   const doubleX = Memo(() => x * 2)
 
+  let ahsad = () => {
+    let xdsa = {
+      x
+    }
+  }
   React(() => {
     let param = {
-      count
+      count,
+      y: y
     }
 
     console.log(param)
