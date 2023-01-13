@@ -36,15 +36,15 @@ function Count() {
 
   let ahsad = () => {
     let ds = {
-      x: x,
+      x,
       y
     }
   }
   React(() => {
     let param = {
       count: count,
-      x: x,
-      y: y
+      x,
+      y
     }
 
     console.log(param)
@@ -53,7 +53,7 @@ function Count() {
   React(() => {
     let params = {
       x: x,
-      y: y,
+      y: y //
     }
     console.log(x, y)
   })

@@ -30,7 +30,7 @@ function Count() {
     let ahsad = () => {
         let ds = {
             x: Read(x),
-            y
+            y: Read(y)
         };
     };
     React(() => {
@@ -44,7 +44,7 @@ function Count() {
     React(() => {
         let params = {
             x: Read(x),
-            y: Read(y),
+            y: Read(y) //
         };
         console.log(Read(x), Read(y));
     });
