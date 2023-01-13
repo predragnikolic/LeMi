@@ -28,7 +28,6 @@ function Count() {
     const { x, y, reset } = mouseCoords();
     const doubleX = Memo(() => x.value * 2);
     let ahsad = () => {
-        x.value = x.value + 1;
         let ds = {
             x: Read(x),
             y
@@ -42,7 +41,13 @@ function Count() {
         };
         console.log(param);
     });
-    // React(() => console.log(x, y))
+    React(() => {
+        let params = {
+            x: Read(x),
+            y: Read(y),
+        };
+        console.log(Read(x), Read(y));
+    });
     return div([
         button({ onclick() { count.value++; } }, ['Increase']),
         p(['Count is ', count]),

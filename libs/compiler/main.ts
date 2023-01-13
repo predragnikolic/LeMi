@@ -30,6 +30,14 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
     )
   }
 
+  const findReactiveCall = (node: ts.Node) => {
+    if (!node.parent) return undefined
+    if (ts.isCallExpression(node.parent) && node.parent.expression.getText() === 'React') {
+      return node.parent
+    };
+    return findReactiveCall(node.parent);
+  };
+
 
   const transformerFactory: ts.TransformerFactory<ts.SourceFile> = context => {
     return sourceFile => {
@@ -39,30 +47,6 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
         if (ts.isIdentifier(node)) {
           if (hasSymbolName(node.getFullText()) && !isReactive(symbol)) {
             if (symbol && !foundSymbols.includes(symbol)) foundSymbols.push(symbol)
-          }
-        }
-
-        if (ts.isIdentifier(node)) {
-          if (symbol && isReactive(symbol)) {
-            // let params = {x}
-            // prevent {Read(x)}
-            if (ts.isShorthandPropertyAssignment(node.parent)) {
-              return node
-            }
-            // let params = {x: x}
-            // prevent: let params = {Read(x): Read(x)}
-            // instead:  let params = {x: Read(x)}
-            if (ts.isPropertyAssignment(node.parent) && node.parent.name === node) {
-              return node
-            }
-
-            if (ts.isPropertyAssignment(node.parent) && node.parent.initializer === node) {
-              return factory.createCallExpression(
-              factory.createIdentifier("Read"),
-              undefined,
-              [factory.createIdentifier(node.getText())]
-            )
-            }
           }
         }
 
@@ -131,6 +115,45 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             return NodeDotValue(symbol.name)
           }
         }
+
+        // must be after .value
+        if (ts.isIdentifier(node)) {
+          if (symbol && isReactive(symbol)) {
+            // let params = {x}
+            // prevent {Read(x)}
+            if (ts.isShorthandPropertyAssignment(node.parent)) {
+              return node
+            }
+            // let params = {x: x}
+            // prevent: let params = {Read(x): Read(x)}
+            // instead:  let params = {x: Read(x)}
+            if (ts.isPropertyAssignment(node.parent) && node.parent.name === node) {
+              return node
+            }
+
+            if (ts.isPropertyAssignment(node.parent) && node.parent.initializer === node) {
+              return factory.createCallExpression(
+                factory.createIdentifier("Read"),
+                undefined,
+                [factory.createIdentifier(node.getText())]
+              )
+            }
+
+            let rc = findReactiveCall(node)
+            if (rc) {
+              // always do this in Reactive functions
+              // transform console.log(x, y)
+              // to console.log(Read(x), Read(y))
+              return factory.createCallExpression(
+                factory.createIdentifier("Read"),
+                undefined,
+                [factory.createIdentifier(node.getText())]
+              )
+
+            }
+          }
+        }
+        // end of must be after .value
 
         return ts.visitEachChild(node, visitor, context);
       };

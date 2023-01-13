@@ -35,7 +35,6 @@ function Count() {
   const doubleX = Memo(() => x * 2)
 
   let ahsad = () => {
-    x = x + 1
     let ds = {
       x: x,
       y
@@ -51,7 +50,13 @@ function Count() {
     console.log(param)
   })
 
-  // React(() => console.log(x, y))
+  React(() => {
+    let params = {
+      x: x,
+      y: y,
+    }
+    console.log(x, y)
+  })
   return div([
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),
