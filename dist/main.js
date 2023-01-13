@@ -11,11 +11,6 @@ function mouseCoords() {
     };
     return { x, y, reset };
 }
-// rules
-// 1. cannot override refs from reusable functions,
-//  const {x, y, reset} = mouseCoords()
-//  x = 2 // this is a no go
-//  Instead: only mutate x in `mouseCoords`
 function Count() {
     var count = Ref(0);
     const doubleCount = Memo(() => count.value * 2);
