@@ -11,12 +11,21 @@ function mouseCoords() {
     };
     return { x, y, reset };
 }
+// rules
+// 1. cannot override refs from reusable functions,
+//  const {x, y, reset} = mouseCoords()
+//  x = 2 // this is a no go
+//  Instead: only mutate x in `mouseCoords`
+// 2. If you want to pass a ref as a ref, then
+// {x} compiles to: {x}
+// If you want to read the value of a ref as a value, then
+// {x: x} compiles to: {x: x.value}
 function Count() {
     var count = Ref(0);
     const doubleCount = Memo(() => count.value * 2);
     var people = Ref([1, 2]);
     let x3123 = 321;
-    let { x, y, reset } = mouseCoords();
+    const { x, y, reset } = mouseCoords();
     const doubleX = Memo(() => x.value * 2);
     let ahsad = () => {
         x.value = x.value + 1;
