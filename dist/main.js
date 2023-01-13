@@ -17,9 +17,14 @@ function Count() {
     var people = Ref([1, 2]);
     let x3123 = 321;
     const { x, y, reset } = mouseCoords();
-    const doubleX = Memo(() => x * 2);
-    React(() => console.log(Read(count), Read(x3123)));
-    React(() => console.log(Read(x), Read(y)));
+    const doubleX = Memo(() => x.value * 2);
+    React(() => {
+        let param = {
+            count: Read(count)
+        };
+        console.log(param);
+    });
+    // React(() => console.log(x, y))
     return div([
         button({ onclick() { count.value++; } }, ['Increase']),
         p(['Count is ', count]),

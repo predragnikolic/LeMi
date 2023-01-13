@@ -6,14 +6,15 @@ function mouseCoords() {
         x = e.clientX
         y = e.clientY
     })
-
     const reset = () => {
       x = 0
       y = 0
     }
 
+
     return { x, y, reset }
 }
+
 
 
 function Count() {
@@ -25,9 +26,15 @@ function Count() {
   const {x, y, reset} = mouseCoords()
   const doubleX = Memo(() => x * 2)
 
-  React(() => console.log(count, x3123))
-  React(() => console.log(x, y))
+  React(() => {
+    let param = {
+      count
+    }
 
+    console.log(param)
+  })
+
+  // React(() => console.log(x, y))
   return div([
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),

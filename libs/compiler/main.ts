@@ -7,6 +7,10 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
   // Create array of found symbols
   const foundSymbols: ts.Symbol[] = [];
   const isReactive = (symbol: ts.Symbol) => foundSymbols.includes(symbol)
+  const hasSymbolName = (name: string) => {
+    let l = foundSymbols.map(s => s.name)
+    return l.includes(name.replaceAll('\n', '').trim())
+  }
 
   function NodeDotValue(name: string) {
     return factory.createPropertyAccessExpression(
@@ -39,15 +43,37 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
       const visitor = (node: ts.Node): ts.Node => {
         let symbol = typeChecker.getSymbolAtLocation(node)
 
+        if (ts.isIdentifier(node)) {
+          if (hasSymbolName(node.getFullText()) && !isReactive(symbol)) {
+            if (symbol && !foundSymbols.includes(symbol)) foundSymbols.push(symbol)
+          }
+        }
+
         if (ts.isIdentifier(node) && !ts.isPropertyAccessExpression(node.parent) && node.getText() !== 'React') {
-            let rc = findReactiveCall(node)
-            if (rc) return factory.createCallExpression(
+          let rc = findReactiveCall(node)
+          if (rc && symbol && isReactive(symbol)) {
+            // let params = {x}
+            // prevent {Read(x)}
+            if (ts.isShorthandPropertyAssignment(node.parent)) {
+              return factory.createPropertyAssignment(node.getText(), factory.createCallExpression(
+                factory.createIdentifier("Read"),
+                undefined,
+                [factory.createIdentifier(node.getText())]
+              ))
+            }
+            // let params = {x: x}
+            // prevent: let params = {Read(x): Read(x)}
+            // instead:  let params = {x: Read(x)}
+            if (ts.isPropertyAssignment(node.parent) && node.parent.name === node) {
+              return node
+            }
+            return factory.createCallExpression(
               factory.createIdentifier("Read"),
               undefined,
               [factory.createIdentifier(node.getText())]
-          )
+            )
+          }
         }
-
 
         // transform
         // var x = 0
@@ -55,7 +81,6 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
         // var x = Ref(0)
         if (ts.isVariableDeclaration(node) && isVarDeclaration(node.parent.flags)) {
           const relatedSymbol = (node as any).symbol as ts.Symbol;
-          console.log('spread object', node.getFullText(),)
 
           relatedSymbol && foundSymbols.push(relatedSymbol)
           const refFn = factory.createCallExpression(
