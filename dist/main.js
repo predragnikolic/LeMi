@@ -15,6 +15,8 @@ function Count() {
     var count = Ref(0);
     const doubleCount = Memo(() => count.value * 2);
     var people = Ref([1, 2]);
+    let id = 0;
+    var peopleWithIds = Ref([{ id: id++, text: 'Stanoje' }, { id: id++, text: 'Jelica' }]);
     let x3123 = 321;
     let { x, y, reset } = mouseCoords();
     const doubleX = Memo(() => x.value * 2);
@@ -47,7 +49,7 @@ function Count() {
         p(['Double count is ', doubleCount]),
         Toggle({ open }),
         ol([
-            For(people, (per) => li([per, 'dsad']))
+            For(peopleWithIds, (per) => [per.id, li([per, 'dsad'])])
         ]),
         () => count == 2 && 'da',
         button({ onclick: () => { open.value = !open.value; } }, ['Reset']),

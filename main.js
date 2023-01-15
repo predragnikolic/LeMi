@@ -18,6 +18,8 @@ function Count() {
   var count = 0
   const doubleCount = Memo(() => count * 2)
   var people = [1, 2]
+  let id = 0
+  var peopleWithIds= [{id: id++, text: 'Stanoje'}, {id: id++, text: 'Jelica' }]
   let x3123 = 321
 
   let {x, y, reset} = mouseCoords()
@@ -48,13 +50,15 @@ function Count() {
   })
   var open = false
   return div([
+    // you must wrap the list with a parent, they cannot have siblings, else the list will appear at the bottom :)
+    // this is because I was lazy, so I just left that limitation
     people.map((per) => p(['hello'])),
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),
     p(['Double count is ', doubleCount]),
     Toggle({open}),
     ol([
-      people.map((per) => li([per, 'dsad']))
+      peopleWithIds.map((per) => [per.id, li([per, 'dsad'])])
     ]),
     count == 2 && 'da',
     button({onclick: () => {open = !open}}, ['Reset']),
