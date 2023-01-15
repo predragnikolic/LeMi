@@ -269,7 +269,21 @@ export function For(list, mapFn) {
     React(() => {
         if (!parent.value) return
         let newNodes = list.value.map((item, i) => {
-            let [key, newNode] = mapFn(item, i)
+            let mapResult = mapFn(item, i)
+            let key = null
+            let newNode = null
+            // we passed in a key [uniqueKey, NewNode]
+            if (Array.isArray(mapResult) && mapResult.length === 2) {
+                key = mapResult.at(0)
+                newNode = mapResult.at(1)
+            } else if (mapResult instanceof HTMLElement) {
+                //  t
+                // fallback to index as key
+                key = i
+                newNode = mapResult
+            } else {
+                throw new Error('map items failed. The return value should be:\n(item: T) => HTMLElement\nOR:\n(item: T) => [uniqueKey, HTMLElement]')
+            }
             let oldNode = nodes.get(key)
             if (oldNode) return oldNode
             nodes.set(key, newNode)

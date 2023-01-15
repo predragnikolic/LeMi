@@ -48,13 +48,13 @@ function Count() {
   })
   var open = false
   return div([
-    people.map((per, i) => [i, p(['hello'])]),
+    people.map((per) => [p(['hello'])]),
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),
     p(['Double count is ', doubleCount]),
     Toggle({open}),
     ol([
-      people.map((per, i) => [i, li([per, 'dsad'])])
+      people.map((per) => li([per, 'dsad']))
     ]),
     count == 2 && 'da',
     button({onclick: () => {open = !open}}, ['Reset']),

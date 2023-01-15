@@ -41,13 +41,13 @@ function Count() {
     });
     var open = Ref(false);
     return div([
-        For(people, (per, i) => [i, p(['hello'])]),
+        For(people, (per) => [p(['hello'])]),
         button({ onclick() { count.value++; } }, ['Increase']),
         p(['Count is ', count]),
         p(['Double count is ', doubleCount]),
         Toggle({ open }),
         ol([
-            For(people, (per, i) => [i, li([per, '3123'])])
+            For(people, (per) => li([per, 'dsad']))
         ]),
         () => count == 2 && 'da',
         button({ onclick: () => { open.value = !open.value; } }, ['Reset']),
