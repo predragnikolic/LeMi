@@ -13,16 +13,16 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
   }
 
   const findParent = (node: ts.Node, predicate: (node: ts.Node) => boolean) => {
-  if (!node.parent) {
-    return undefined;
-  }
+    if (!node.parent) {
+      return undefined;
+    }
 
-  if (predicate(node.parent)) {
-    return node.parent;
-  }
+    if (predicate(node.parent)) {
+      return node.parent;
+    }
 
-  return findParent(node.parent, predicate);
-};
+    return findParent(node.parent, predicate);
+  };
 
 
   function NodeDotValue(name: string) {
@@ -63,6 +63,32 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
           }
         }
 
+        if (ts.isCallExpression(node)) {
+          const hasReturnNode = findParent(node, ts.isReturnStatement);
+          const isInDomEl = Boolean(ts.isArrayLiteralExpression(node.parent) && node.parent && ts.isCallExpression(node.parent.parent))
+          // check parents
+          if (isInDomEl && hasReturnNode) {
+            const propertyAccessorChild = node.getChildren().at(0)
+            const isMap = ts.isPropertyAccessExpression(propertyAccessorChild) &&
+              ts.isIdentifier(propertyAccessorChild.getChildren().at(2)) &&
+              propertyAccessorChild.getChildren().at(2)?.getText() === 'map'
+            let arrayName = propertyAccessorChild.getChildren().at(0)?.getText()
+
+            if (isMap && arrayName) {
+              const functionChild = node.getChildAt(2).getChildAt(0)
+
+              return factory.createCallExpression(
+                factory.createIdentifier("For"),
+                undefined,
+                [
+                  factory.createIdentifier(arrayName),
+                  functionChild
+                ]
+              )
+
+            }
+          }
+        }
         // transform
         // var x = 0
         // to
@@ -134,8 +160,8 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
           if (symbol && isReactive(symbol)) {
             const hasObjectBindingNode = findParent(node, ts.isObjectBindingPattern);
             // fixes     const { Read(x), Read(y), reset } = mouseCoords();
-            if (hasObjectBindingNode &&  ts.isVariableDeclaration(hasObjectBindingNode.parent)) {
-                return node
+            if (hasObjectBindingNode && ts.isVariableDeclaration(hasObjectBindingNode.parent)) {
+              return node
             }
 
             const parameterNode = findParent(node, ts.isParameter)
@@ -148,7 +174,7 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             const hasReturnNode = findParent(node, ts.isReturnStatement);
             // fixes     const { Read(x), Read(y), reset } = mouseCoords();
             if (hasReturnNode) {
-                return node
+              return node
             }
 
             // let params = {x}
