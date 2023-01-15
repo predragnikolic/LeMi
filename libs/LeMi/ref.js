@@ -1,9 +1,6 @@
 import {isRef} from './h.js'
 
-/**
- * @template {unknown} Return
- * @typedef {() => Return} Context
- */
+
 /** @type {Context<unknown>[]} */
 const context = []
 

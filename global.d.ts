@@ -1,5 +1,6 @@
 type Ref<T> = T
 
+type Context<Return = unknown> = () => Ref<Return>
 declare function Ref<T>(value: T): Ref<T>
 declare function React(cb: Context<void>): void
 declare function Memo<Ret>(cb: Context<Ret>): Ref<Ret>
