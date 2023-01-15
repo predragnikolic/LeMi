@@ -41,7 +41,7 @@ function Count() {
     });
     var open = Ref(false);
     return div([
-        For(people, (per) => [p(['hello'])]),
+        For(people, (per) => p(['hello'])),
         button({ onclick() { count.value++; } }, ['Increase']),
         p(['Count is ', count]),
         p(['Double count is ', doubleCount]),

@@ -48,7 +48,7 @@ function Count() {
   })
   var open = false
   return div([
-    people.map((per) => [p(['hello'])]),
+    people.map((per) => p(['hello'])),
     button({ onclick() { count++ } }, ['Increase']),
     p(['Count is ', count]),
     p(['Double count is ', doubleCount]),
