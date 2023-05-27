@@ -57,9 +57,20 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
       const visitor = (node: ts.Node): ts.Node => {
         let symbol = typeChecker.getSymbolAtLocation(node)
 
+        // find symbols
         if (ts.isIdentifier(node)) {
           if (hasSymbolName(node.getFullText()) && !isReactive(symbol)) {
-            if (symbol && !foundSymbols.includes(symbol)) foundSymbols.push(symbol)
+            if (symbol) foundSymbols.push(symbol)
+          }
+
+          if (ts.isParameter(node.parent) && ts.isFunctionDeclaration(node.parent.parent)) {
+            console.log('symbol', symbol)
+            if (symbol && !isReactive(symbol)) foundSymbols.push(symbol)
+          }
+
+          if (ts.isBindingElement(node.parent) && ts.isObjectBindingPattern(node.parent.parent) && ts.isParameter(node.parent.parent.parent) && ts.isFunctionDeclaration(node.parent.parent.parent.parent)) {
+              console.log('symbol', symbol)
+              if (symbol && !isReactive(symbol)) foundSymbols.push(symbol)
           }
         }
 
@@ -111,16 +122,20 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
           return newVar
         }
 
+        //  Transform
         // [open.value ? 'open' : 'closed'],
+        // to
         // [() => open.value ? 'open' : 'closed]',
-        // this is required because how I implemented the front LeMi lib
+        // ... this is required because how I implemented the front LeMi lib
         if (ts.isConditionalExpression(node) && ts.isArrayLiteralExpression(node.parent)) {
           let newNode: ts.ConditionalExpression | null = null
           if (ts.isIdentifier(node.condition)) newNode = factory.createConditionalExpression(NodeDotValue(node.condition.getText()), node.questionToken, node.whenTrue, node.colonToken, node.whenFalse)
           return createArrowFn(newNode ?? node)
         }
 
+        // transform
         // [open.value && 'true']
+        // to
         // [() => open.value && 'true']
         // this is required because how I implemented the front LeMi lib
         if (ts.isBinaryExpression(node) && ts.isArrayLiteralExpression(node.parent)) {
