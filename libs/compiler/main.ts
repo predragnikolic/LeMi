@@ -32,6 +32,7 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
     )
   }
 
+
   function createArrowFn(node: ts.Expression): ts.Node {
     return factory.createArrowFunction(
       undefined,
@@ -63,15 +64,24 @@ const transformerProgram = (program: ts.Program, config): ts.TransformerFactory<
             if (symbol) foundSymbols.push(symbol)
           }
 
-          if (ts.isParameter(node.parent) && ts.isFunctionDeclaration(node.parent.parent)) {
-            console.log('symbol', symbol)
-            if (symbol && !isReactive(symbol)) foundSymbols.push(symbol)
-          }
 
-          if (ts.isBindingElement(node.parent) && ts.isObjectBindingPattern(node.parent.parent) && ts.isParameter(node.parent.parent.parent) && ts.isFunctionDeclaration(node.parent.parent.parent.parent)) {
-              console.log('symbol', symbol)
-              if (symbol && !isReactive(symbol)) foundSymbols.push(symbol)
-          }
+          // all component props are reactive by default
+          // if (ts.isParameter(node.parent) && ts.isFunctionDeclaration(node.parent.parent)) {
+          //   const functionName = node.parent.parent.name?.getFullText().trim() ?? ""
+          //   if (symbol && !isReactive(symbol) && isUpperCase(functionName[0])) {
+          //     console.log('ovde', functionName, isUpperCase(functionName[0]))
+          //     foundSymbols.push(symbol)
+          //   }
+          // }
+
+          // // all destructured component props are reactive by default
+          // if (ts.isBindingElement(node.parent) && ts.isObjectBindingPattern(node.parent.parent) && ts.isParameter(node.parent.parent.parent) && ts.isFunctionDeclaration(node.parent.parent.parent.parent)) {
+          //     const functionName = node.parent.parent.parent.parent.name?.getFullText().trim() ?? ""
+          //     if (symbol && !isReactive(symbol) && isUpperCase(functionName[0])) {
+          //       console.log('ovde', functionName, isUpperCase(functionName[0]))
+          //       foundSymbols.push(symbol)
+          //     }
+          // }
         }
 
         if (ts.isCallExpression(node)) {
@@ -241,5 +251,8 @@ function isVarDeclaration(flags: ts.NodeFlags): Boolean {
   return !(flags & ts.NodeFlags.Let) && !(flags & ts.NodeFlags.Const)
 }
 
+function isUpperCase(str: string) {
+    return str === str.toUpperCase();
+}
 
 export default transformerProgram;
